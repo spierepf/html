@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "html.h"
 
@@ -31,20 +32,42 @@ HTMLNode head(string title) {
             );
 }
 
-HTMLNode menuItem(std::string name, std::string href="#", bool isActive=false) {
+HTMLNode menuItem(string name, string href="#", bool isActive=false) {
     HTMLNode retval("li");
     if(isActive) retval.addAttribute("class", "active");
     retval.addContent(HTMLNode("a").addAttribute("href", href).addContent(name));
     return retval;
 }
 
+struct MenuItem {
+    string name;
+    string href;
+
+    MenuItem(string name, string href = "#") : name(name), href(href) {}
+};
+
+HTMLNode menu(vector<MenuItem> items, int activeIndex) {
+    HTMLNode retval("ul");
+    for (int i = 0; i < items.size(); ++i) {
+        retval.addContent(menuItem(items[i].name, items[i].href, activeIndex == i));
+    }
+    return retval;
+}
+
 int main() {
-    std::cout << (string)HTMLNode()
+    vector<MenuItem> menuItems;
+    menuItems.push_back(MenuItem("Dashboard"));
+    menuItems.push_back(MenuItem("Age"));
+    menuItems.push_back(MenuItem("Gender"));
+    menuItems.push_back(MenuItem("Geo"));
+
+    cout << (string)HTMLNode()
         .addContent("<!DOCTYPE html>")
         .addContent(HTMLNode("html").addAttribute("lang", "en")
             .addContent(head("Bootstrap Example"))
             .addContent(HTMLNode("body")
-                .addContent(HTMLNode("nav").addAttribute("class", "navbar navbar-inverse visible-xs")
+                .addContent(HTMLNode("nav"
+                    ).addAttribute("class", "navbar navbar-inverse visible-xs")
                     .addContent(HTMLNode("div").addAttribute("class", "container-fluid")
                         .addContent(HTMLNode("div").addAttribute("class", "navbar-header")
                             .addContent(HTMLNode("button").addAttribute("type", "button").addAttribute("class", "navbar-toggle").addAttribute("data-toggle", "collapse").addAttribute("data-target", "#myNavbar")
@@ -55,12 +78,7 @@ int main() {
                             .addContent(HTMLNode("a").addAttribute("class", "navbar-brand").addAttribute("href", "#").addContent("Logo"))
                         )                              
                         .addContent(HTMLNode("div").addAttribute("class", "collapse navbar-collapse").addAttribute("id", "myNavbar")
-                            .addContent(HTMLNode("ul").addAttribute("class", "nav navbar-nav")
-                                .addContent(menuItem("Dashboard", "#", true))
-                                .addContent(menuItem("Age"))
-                                .addContent(menuItem("Gender"))
-                                .addContent(menuItem("Geo"))
-                            )
+                            .addContent(menu(menuItems, 0).addAttribute("class", "nav navbar-nav"))
                         )
                     )
                 )
@@ -68,12 +86,7 @@ int main() {
                     .addContent(HTMLNode("div").addAttribute("class", "row content")
                         .addContent(HTMLNode("div").addAttribute("class", "col-sm-3 sidenav hidden-xs")
                             .addContent(HTMLNode("h2").addContent("Logo"))
-                            .addContent(HTMLNode("ul").addAttribute("class", "nav nav-pills nav-stacked")
-                                .addContent(menuItem("Dashboard", "#", true))
-                                .addContent(menuItem("Age"))
-                                .addContent(menuItem("Gender"))
-                                .addContent(menuItem("Geo"))
-                            )
+                            .addContent(menu(menuItems, 0).addAttribute("class", "nav nav-pills nav-stacked"))
                             .addContent(HTMLNode("br"))
                         )
                         .addContent(HTMLNode("br"))
@@ -147,6 +160,6 @@ int main() {
                     )
                 )
             )
-        ) << std::endl;
+        ) << endl;
 }
 
